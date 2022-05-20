@@ -1,6 +1,7 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route, useHistory } from 'react-router-dom';
+import cookie from 'react-cookie';
 import axios from 'axios';
 import NavBar from './components/NavBar';
 import Main from './views/Main';
@@ -8,6 +9,7 @@ import RegistrationForm from './components/RegistrationForm';
 import LoginForm from './components/LoginForm';
 import Dashboard from './views/Dashboard';
 import OneDayCard from './components/OneDayCard';
+import Preference from './views/Preference';
 
 function App() {
   //our user, if logged in
@@ -24,25 +26,28 @@ function App() {
 
   useEffect(()=>{
     //check to see if the user is logged in. If so, pass these credentials to navbar and dashboard
-    axios.get("http://localhost:8000/api/users/getuser", {withCredentials:true})
-    .then(res => {
-        setUser(res.data.user);
-        setPreference(res.data.user.preference);
-        setLoggedIn(true);
-        //get geolocation data from the logged in user to populate front page
-        navigator.geolocation.getCurrentPosition((pos) => {
-          setPosition(pos.coords);
-          setPositionLoaded(true);
-        });
-    })
-    .catch(err => {
-        console.error(err);
-        //get geolocation data from the logged in user to populate front page
-        navigator.geolocation.getCurrentPosition((pos) => {
-          setPosition(pos.coords);
-          setPositionLoaded(true);
-        });
-    })
+    if(cookie.load('usertoken') !== undefined){
+      axios.get("http://localhost:8000/api/users/getuser", {withCredentials:true})
+      .then(res => {
+          setUser(res.data.user);
+          setPreference(res.data.user.preference);
+          setLoggedIn(true);
+          //get geolocation data from the logged in user to populate front page
+          navigator.geolocation.getCurrentPosition((pos) => {
+            setPosition({ latitude: pos.coords.latitude, longitude:pos.coords.longitude });
+            setPositionLoaded(true);
+          });
+      })
+      .catch(err => {
+          console.error(err);
+      })
+    } else {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        setPosition({ latitude: pos.coords.latitude, longitude:pos.coords.longitude });
+        setPositionLoaded(true);
+      });
+    }
+  
   },[])
 
   //this we'll pass to the registration and login pages so that when the user logs in, we're updating the user and logged in state
@@ -65,7 +70,7 @@ function App() {
   return (
     <BrowserRouter>
         <div className="App">
-          <NavBar loggedIn={ loggedIn } user={ user } passbackLogout={ passbackLogout } />
+          <NavBar loggedIn={ loggedIn } user={ user } preference={ preference } passbackLogout={ passbackLogout } />
           <div className="container">
             <Switch>
               <Route exact path="/">
@@ -82,6 +87,9 @@ function App() {
               </Route>
               <Route path="/day/:pref/:lat/:lng">
                 <OneDayCard />
+              </Route>
+              <Route path="/user/preferences">
+                {loggedIn && <Preference user={ user } preference={preference} passbackPreference={ setPreference } /> }
               </Route>
             </Switch>
           </div>

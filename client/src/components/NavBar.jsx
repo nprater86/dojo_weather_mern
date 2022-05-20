@@ -5,14 +5,14 @@ import SearchLocationInput from './SearchLocationInput';
 import axios from 'axios';
 
 const NavBar = props => {
-    const { loggedIn, user } = props;
+    const { loggedIn, user, preference } = props;
     const history = useHistory();
     const [geolocation, setGeolocation] = useState({});
 
-    //will bring user to dashboard
-    function handleDashboard(e){
+    //will bring user to the url specific in the onClick event listener
+    function handleLink(e,url){
         e.preventDefault();
-        history.push("/dashboard");
+        history.push(url);
     }
 
     //will log the user out, and pass the logout back to the app
@@ -28,10 +28,11 @@ const NavBar = props => {
             .catch(err => console.error(err))
     }
 
-    //will use this to call the open weather api
+    //will use this to change to the location route and call up the new weather data
     function handleLocationSubmit(e){
         e.preventDefault();
         console.log(geolocation);
+        history.push(`/day/${preference}/${geolocation.lat}/${geolocation.lng}`);
     }
 
     //use this to get the geolocation data from google maps API in the SearchLocation component
@@ -55,8 +56,9 @@ const NavBar = props => {
                             <Navbar.Collapse>
                                 <Nav>
                                     <NavDropdown title={"Welcome, " +  user.firstName + "!"} menuVariant="light">
-                                    <NavDropdown.Item href="#" onClick={ e => handleDashboard(e) }>My Dashboard</NavDropdown.Item>
+                                    <NavDropdown.Item href="#" onClick={ e => handleLink(e, "/dashboard") }>My Dashboard</NavDropdown.Item>
                                         <NavDropdown.Divider />
+                                        <NavDropdown.Item href="#" onClick={ e => handleLink(e, "/user/preferences") }>Preferences</NavDropdown.Item>
                                         <NavDropdown.Item href="#" onClick={ e => handleLogout(e) }>Logout</NavDropdown.Item>
                                     </NavDropdown>
                                 </Nav>
