@@ -1,5 +1,15 @@
+.App{
+    font-family: 'Poppins', sans-serif;
+}
+
 .form-label {
     color: white;
+    
+}
+
+#logo {
+    font-size: 42px;
+    font-weight: 500;
 }
 
 

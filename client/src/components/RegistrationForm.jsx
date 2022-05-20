@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 
 const RegistrationForm = props => {
@@ -8,6 +9,7 @@ const RegistrationForm = props => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errors, setErrors] = useState({});
+    const history = useHistory();
 
     function onSubmitHandler(e){
         e.preventDefault();
@@ -17,10 +19,11 @@ const RegistrationForm = props => {
             lastName,
             email,
             password,
-            confirmPassword
+            confirmPassword,
+            preference: "imperial"
         }
 
-        axios.post('http://localhost:8000/api/users/new', user)
+        axios.post('http://localhost:8000/api/users/new', user, {withCredentials: true})
             .then(res => {
                 console.log(res);
                 setFirstName("");
@@ -29,6 +32,8 @@ const RegistrationForm = props => {
                 setPassword("");
                 setConfirmPassword("");
                 setErrors({});
+                props.onSubmitProp();
+                history.push("/");
             })
             .catch(err => {
                 console.error(err.response.data.errors);
@@ -66,7 +71,7 @@ const RegistrationForm = props => {
                     { errors.password && <p className="text-light" style={{fontWeight:"bold"}}>{ errors.password.message }</p> }
                     { errors.confirmPassword && <p className="text-light" style={{fontWeight:"bold"}}>{ errors.confirmPassword.message }</p> }
                 </div>
-                <button type="submit" className="btn btn-primary ms-5">Submit</button>
+                <button type="submit" className="btn btn-primary ms-5">Register</button>
             </form>
         </div>
     );
