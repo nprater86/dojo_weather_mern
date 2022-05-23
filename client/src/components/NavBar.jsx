@@ -5,7 +5,7 @@ import SearchLocationInput from './SearchLocationInput';
 import axios from 'axios';
 
 const NavBar = props => {
-    const { loggedIn, user, preference } = props;
+    const { loggedIn, user, } = props;
     const history = useHistory();
     const [geolocation, setGeolocation] = useState({});
 
@@ -31,8 +31,7 @@ const NavBar = props => {
     //will use this to change to the location route and call up the new weather data
     function handleLocationSubmit(e){
         e.preventDefault();
-        console.log(geolocation);
-        history.push(`/day/${preference}/${geolocation.lat}/${geolocation.lng}`);
+        history.push(`/day/${geolocation.lat}/${geolocation.lng}`);
     }
 
     //use this to get the geolocation data from google maps API in the SearchLocation component

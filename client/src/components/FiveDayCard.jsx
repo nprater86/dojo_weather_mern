@@ -1,23 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import UserContext from '../context/UserContext';
+import axios from 'axios';
 
-const OneDayCard = props => {
-    const { weatherData, preference } = props;
+const FiveDayCard = props => {
+    const userContext = useContext(UserContext);
+    const { lat, lng } = props;
+    const [weatherData, setWeatherData] = useState();
+    const [loaded, setLoaded] = useState(false);
 
-    console.log(weatherData);
+    useEffect(async () => {
+        const weatherResult = await axios.get(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&exclude=minutely&appid=2f5c71d5d96169baf744185a2ea344c7&units=${userContext.user.preference}`);
+        setWeatherData(weatherResult.data);
+        setLoaded(true);
+    }, [])
 
     return (
-        <div className="border p-5 w-75 m-auto rounded">
-            <div className="row">
-                <div className="col-auto m-auto text-center">
-                    <h1>{ Math.round(weatherData.current.temp) }&deg;</h1>
-                    <img src={"http://openweathermap.org/img/wn/" + weatherData.current.weather[0].icon + "@2x.png"} />
-                    <h4>{weatherData.current.weather[0].description}</h4>
-                    <div className="div d-flex justify-content-between gap-4">
-                        <h4>High {Math.round(weatherData.daily[0].temp.max)}&deg;</h4>
-                        <h4>Low {Math.round(weatherData.daily[0].temp.min)}&deg;</h4>
-                    </div>
-                </div>
+        <div>
+            { loaded &&
+            <div className="row border rounded p-5 mb-5 d-flex">
+                {
+                    weatherData.daily.map((day,i) => {
+                        if (i < 5){
+                            return (
+                                <div className="col-2 m-auto" key={i}>
+                                    <div className="row m-auto text-center">
+                                        <h6>{ Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(new Date(weatherData.daily[i].dt*1000)) }</h6>
+                                    </div>
+                                    <div className="row">
+                                        <img src={"http://openweathermap.org/img/wn/" + weatherData.daily[i].weather[0].icon + "@2x.png"} />
+                                    </div>
+                                    <div className="row d-flex text-center">
+                                        <div className="col">{ Math.round(weatherData.daily[i].temp.max) }&deg;</div>
+                                        <div className="col">{ Math.round(weatherData.daily[i].temp.min) }&deg;</div>
+                                    </div>
+                                </div>
+                            )
+                        }
+                    })
+                }
             </div>
+            }
         </div>
     );
 }
+
+export default FiveDayCard;

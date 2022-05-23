@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route, useHistory } from 'react-router-dom';
 import cookie from 'react-cookie';
 import axios from 'axios';
+import UserContext from './context/UserContext';
 import NavBar from './components/NavBar';
 import Main from './views/Main';
 import RegistrationForm from './components/RegistrationForm';
@@ -13,7 +14,7 @@ import Preference from './views/Preference';
 
 function App() {
   //our user, if logged in
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
   //logged in state to pass to navbar, as it will update based on whether the user is logged in or not
   const [loggedIn, setLoggedIn] = useState(false);
   //set city and weather based on user location data
@@ -45,6 +46,7 @@ function App() {
       navigator.geolocation.getCurrentPosition((pos) => {
         setPosition({ latitude: pos.coords.latitude, longitude:pos.coords.longitude });
         setPositionLoaded(true);
+        setUser(undefined);
       });
     }
   
@@ -70,29 +72,31 @@ function App() {
   return (
     <BrowserRouter>
         <div className="App">
-          <NavBar loggedIn={ loggedIn } user={ user } preference={ preference } passbackLogout={ passbackLogout } />
-          <div className="container">
-            <Switch>
-              <Route exact path="/">
-                <Main preference={preference} position={ position } positionLoaded={ positionLoaded }/>
-              </Route>
-              <Route path="/register">
-                <RegistrationForm onSubmitProp={ getLogin } />
-              </Route>
-              <Route path="/login">
-                <LoginForm onSubmitProp={ getLogin } />
-              </Route>
-              <Route path="/dashboard">
-                <Dashboard user={ user }/>
-              </Route>
-              <Route path="/day/:pref/:lat/:lng">
-                <OneDayCard />
-              </Route>
-              <Route path="/user/preferences">
-                {loggedIn && <Preference user={ user } preference={preference} passbackPreference={ setPreference } /> }
-              </Route>
-            </Switch>
-          </div>
+          <UserContext.Provider value={{user, setUser}}>
+            <NavBar loggedIn={ loggedIn } user={ user } preference={ preference } passbackLogout={ passbackLogout } />
+            <div className="container">
+              <Switch>
+                <Route exact path="/">
+                  <Main preference={preference} position={ position } positionLoaded={ positionLoaded }/>
+                </Route>
+                <Route path="/register">
+                  <RegistrationForm onSubmitProp={ getLogin } />
+                </Route>
+                <Route path="/login">
+                  <LoginForm onSubmitProp={ getLogin } />
+                </Route>
+                <Route path="/dashboard">
+                  <Dashboard user={ user }/>
+                </Route>
+                <Route path="/day/:lat/:lng">
+                  <OneDayCard />
+                </Route>
+                <Route path="/user/preferences">
+                  {loggedIn && <Preference /> }
+                </Route>
+              </Switch>
+            </div>
+          </UserContext.Provider>
         </div>
     </BrowserRouter>
   );

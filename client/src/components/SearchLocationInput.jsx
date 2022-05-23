@@ -53,7 +53,6 @@ function SearchLocationInput(props) {
         const query = addressObject.formatted_address;
         updateQuery(query);
         props.passbackGeolocation({
-            city: (addressObject.address_components[0].long_name + ", " + addressObject.address_components[2].short_name),
             lat: addressObject.geometry.location.lat(query),
             lng: addressObject.geometry.location.lng(query)
         });

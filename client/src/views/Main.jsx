@@ -7,7 +7,7 @@ const Main = props => {
 
     useEffect(()=>{
         if(positionLoaded === true){
-            history.push(`/day/${preference}/${position.latitude}/${position.longitude}`);
+            history.push(`/day/${position.latitude}/${position.longitude}`);
         }
     },[positionLoaded])
 

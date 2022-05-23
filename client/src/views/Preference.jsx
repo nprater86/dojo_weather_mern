@@ -1,13 +1,15 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import UserContext from '../context/UserContext';
 
 const Preference = props => {
-    const [preference, setPreference] = useState(props.preference);
+    const userContext = useContext(UserContext);
+    const [preference, setPreference] = useState(userContext.user.preference);
     const history = useHistory();
 
     useEffect(()=> {
-        if(props.user == undefined){
+        if(userContext.user === undefined){
             history.push("/");
         }
     }, []);
@@ -15,10 +17,9 @@ const Preference = props => {
     function handlePreferenceChange(e){
         e.preventDefault();
 
-        axios.put("http://localhost:8000/api/users/update/" + props.user.id, { preference:preference })
+        axios.put("http://localhost:8000/api/users/update/" + userContext.user._id, { preference:preference })
             .then(res => {
-                console.log(res);
-                props.passbackPreference(preference);
+                userContext.setUser(res.data.user);
                 history.goBack();
             })
             .catch(err => console.error(err));

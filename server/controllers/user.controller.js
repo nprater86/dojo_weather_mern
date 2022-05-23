@@ -13,7 +13,7 @@ module.exports.findOneSingleUser = (req, res) => {
 
     User.findOne({ _id: decodedJwt.payload.id })
         .then(oneSingleUser => res.json({ user: {
-            id: oneSingleUser._id,
+            _id: oneSingleUser._id,
             firstName: oneSingleUser.firstName,
             locations: oneSingleUser.locations,
             preference: oneSingleUser.preference
