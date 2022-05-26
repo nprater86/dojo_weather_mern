@@ -1,5 +1,8 @@
 .App{
     font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .form-label {
@@ -12,4 +15,15 @@
     font-weight: 500;
 }
 
+i {
+    font-size: 1.5rem;
+}
 
+.fa-trash-can {
+    font-size: 1.2rem;
+}
+
+.logoLink {
+    width: 100px;
+    height: auto;
+}

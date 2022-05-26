@@ -2,34 +2,34 @@ import React, { useContext } from 'react';
 import axios from 'axios';
 import UserContext from '../context/UserContext';
 
-const RemoveLocation = props => {
+const AddLocation = props => {
     const userContext = useContext(UserContext);
-    const { city, onSubmitProp } = props;
+    const { city, lat, lng, onSubmitProp } = props;
 
-    function handleRemoveLocation(e){
+    function handleAddLocation(e){
         e.preventDefault();
 
         axios.put("http://localhost:8000/api/users/update/" + userContext.user._id, {
-            "$pull": {
+            "$push": {
                 locations: {
-                    "city": city
+                    "city": city, 
+                    "lat": lat, 
+                    "lng": lng
                 }
             } 
         })
         .then(res => {
             userContext.setUser(res.data.user);
-            if(onSubmitProp){
-                onSubmitProp();
-            };
+            onSubmitProp();
         })
         .catch(err => console.error(err));
     }
 
     return (
-        <div>
-            <a style={{textDecoration: 'none'}} href="#" onClick={ e => handleRemoveLocation(e) }>{ props.children }</a>
+        <div className="m-auto d-flex align-items-center">
+            <a className="m-auto" href="#" onClick={ e => handleAddLocation(e) }>{ props.children }</a>
         </div>
     );
 }
 
-export default RemoveLocation;
+export default AddLocation

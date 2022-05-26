@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { Navbar, Nav, NavDropdown, Container } from 'react-bootstrap';
 import SearchLocationInput from './SearchLocationInput';
+import UserContext from '../context/UserContext';
 import axios from 'axios';
 
 const NavBar = props => {
-    const { loggedIn, user, } = props;
+    const userContext = useContext(UserContext);
     const history = useHistory();
     const [geolocation, setGeolocation] = useState({});
 
@@ -15,46 +16,38 @@ const NavBar = props => {
         history.push(url);
     }
 
-    //will log the user out, and pass the logout back to the app
+    //will log the user out
     function handleLogout(e){
         e.preventDefault();
 
         axios.get("http://localhost:8000/api/users/logout", {withCredentials: true})
             .then(res => {
                 console.log("User logged out successfully -->", res);
-                props.passbackLogout();
+                userContext.setLoggedIn(false);
+                userContext.setUser({});
                 history.push("/");
             })
             .catch(err => console.error(err))
     }
 
-    //will use this to change to the location route and call up the new weather data
-    function handleLocationSubmit(e){
-        e.preventDefault();
-        history.push(`/day/${geolocation.lat}/${geolocation.lng}`);
-    }
-
-    //use this to get the geolocation data from google maps API in the SearchLocation component
-    function passbackGeolocation(location){
-        setGeolocation(location);
+    //handle preference change
+    function handlePrefChange(e){
+        userContext.setPreference(e.target.value);
     }
 
     return (
         <div>
-            <Navbar variant="dark" bg="info" expand="lg" className="mb-3">
-                <Container>
-                    <div className="d-flex align-items-center">
-                        <Link to="/" className="text-decoration-none"><Navbar.Brand id="logo">DojoWeather</Navbar.Brand></Link>
-                        <form className="d-flex" onSubmit={ e => handleLocationSubmit(e) }>
-                            <SearchLocationInput passbackGeolocation={ passbackGeolocation }/>
-                            <button className="btn btn-outline-light" type="submit">Search</button>
-                        </form>
+            <Navbar variant="dark" bg="info" className="mb-3">
+                <Container className="flex-wrap flex-md-nowrap">
+                    <div className="d-flex align-items-center flex-wrap flex-sm-nowrap">
+                        <Link to="/" className="text-decoration-none"><Navbar.Brand id="logo">Dojo<em>Weather</em></Navbar.Brand></Link>
+                        <SearchLocationInput />
                     </div>
-                    { loggedIn ?
+                    { userContext.loggedIn ?
                         <div className="ms-auto">
                             <Navbar.Collapse>
                                 <Nav>
-                                    <NavDropdown title={"Welcome, " +  user.firstName + "!"} menuVariant="light">
+                                    <NavDropdown title={"Welcome, " +  userContext.user.firstName + "!"} menuVariant="light">
                                     <NavDropdown.Item href="#" onClick={ e => handleLink(e, "/dashboard") }>My Dashboard</NavDropdown.Item>
                                         <NavDropdown.Divider />
                                         <NavDropdown.Item href="#" onClick={ e => handleLink(e, "/user/preferences") }>Preferences</NavDropdown.Item>
@@ -65,6 +58,12 @@ const NavBar = props => {
                         </div>
                         :
                         <ul className="navbar-nav">
+                            <li className="nav-item me-3">
+                                <select onChange={ e => handlePrefChange(e) } className="form-select" aria-label="select temperature scale">
+                                    { userContext.preference === "imperial" ? <option value="imperial" defaultValue>&deg;F</option> : <option value="imperial">&deg;F</option> }
+                                    { userContext.preference === "metric" ? <option value="metric" defaultValue>&deg;C</option> : <option value="metric">&deg;C</option> }
+                                </select>
+                            </li>
                             <li className="nav-item">
                                 <Link to="/register" className="text-decoration-none"><p className="nav-link mb-0 active" href="#">Register</p></Link>
                             </li>

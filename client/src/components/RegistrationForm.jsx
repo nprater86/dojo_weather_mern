@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import UserContext from '../context/UserContext';
 import axios from 'axios';
 
 const RegistrationForm = props => {
+    const userContext = useContext(UserContext);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -25,14 +27,14 @@ const RegistrationForm = props => {
 
         axios.post('http://localhost:8000/api/users/new', user, {withCredentials: true})
             .then(res => {
-                console.log(res);
                 setFirstName("");
                 setLastName("");
                 setEmail("");
                 setPassword("");
                 setConfirmPassword("");
                 setErrors({});
-                props.onSubmitProp();
+                userContext.setUser(res.data.user);
+                userContext.setLoggedIn(true);
                 history.push("/");
             })
             .catch(err => {

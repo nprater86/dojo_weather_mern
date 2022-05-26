@@ -9,7 +9,7 @@ const Preference = props => {
     const history = useHistory();
 
     useEffect(()=> {
-        if(userContext.user === undefined){
+        if(!userContext.loggedIn){
             history.push("/");
         }
     }, []);
@@ -20,6 +20,7 @@ const Preference = props => {
         axios.put("http://localhost:8000/api/users/update/" + userContext.user._id, { preference:preference })
             .then(res => {
                 userContext.setUser(res.data.user);
+                userContext.setPreference(preference);
                 history.goBack();
             })
             .catch(err => console.error(err));

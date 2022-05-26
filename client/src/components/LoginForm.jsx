@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+import UserContext from '../context/UserContext';
 import axios from 'axios';
 
 const LoginForm = props => {
+    const userContext = useContext(UserContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
@@ -18,10 +20,10 @@ const LoginForm = props => {
 
         axios.post('http://localhost:8000/api/users/login', user, {withCredentials: true})
             .then(res => {
-                console.log(res);
                 setEmail("");
                 setPassword("");
-                props.onSubmitProp();
+                userContext.setUser(res.data.user);
+                userContext.setLoggedIn(true);
                 history.push("/");
             })
             .catch(err => {

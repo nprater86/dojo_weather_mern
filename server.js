@@ -15,6 +15,9 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 const AllUserRoutes = require("./server/routes/user.routes");
 AllUserRoutes(app);
 
+const AllAPIRoutes = require("./server/routes/apis.routes");
+AllAPIRoutes(app);
+
 // req is short for request
 // res is short for response
 app.get('/api', (req, res) => {

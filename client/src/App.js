@@ -1,6 +1,6 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Switch, Route, useHistory } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import cookie from 'react-cookie';
 import axios from 'axios';
 import UserContext from './context/UserContext';
@@ -11,6 +11,7 @@ import LoginForm from './components/LoginForm';
 import Dashboard from './views/Dashboard';
 import OneDayCard from './components/OneDayCard';
 import Preference from './views/Preference';
+import Footer from './components/Footer';
 
 function App() {
   //our user, if logged in
@@ -22,8 +23,6 @@ function App() {
   const [positionLoaded, setPositionLoaded] = useState(false);
   //set preference
   const [preference, setPreference] = useState("imperial");
-  //useHistory
-  const history = useHistory();
 
   useEffect(()=>{
     //check to see if the user is logged in. If so, pass these credentials to navbar and dashboard
@@ -46,57 +45,42 @@ function App() {
       navigator.geolocation.getCurrentPosition((pos) => {
         setPosition({ latitude: pos.coords.latitude, longitude:pos.coords.longitude });
         setPositionLoaded(true);
-        setUser(undefined);
       });
     }
-  
+    
   },[])
-
-  //this we'll pass to the registration and login pages so that when the user logs in, we're updating the user and logged in state
-  function getLogin() {
-    axios.get("http://localhost:8000/api/users/getuser", {withCredentials:true})
-        .then(res => {
-            setUser(res.data.user);
-            setLoggedIn(true);
-        })
-        .catch(err => {
-            console.error(err);
-        })
-  }
-
-  //this will set logged in state to false when the user selects "Logout" in the navbar
-  function passbackLogout() {
-    setLoggedIn(false);
-  }
 
   return (
     <BrowserRouter>
-        <div className="App">
-          <UserContext.Provider value={{user, setUser}}>
-            <NavBar loggedIn={ loggedIn } user={ user } preference={ preference } passbackLogout={ passbackLogout } />
-            <div className="container">
-              <Switch>
-                <Route exact path="/">
-                  <Main preference={preference} position={ position } positionLoaded={ positionLoaded }/>
-                </Route>
-                <Route path="/register">
-                  <RegistrationForm onSubmitProp={ getLogin } />
-                </Route>
-                <Route path="/login">
-                  <LoginForm onSubmitProp={ getLogin } />
-                </Route>
-                <Route path="/dashboard">
-                  <Dashboard user={ user }/>
-                </Route>
-                <Route path="/day/:lat/:lng">
-                  <OneDayCard />
-                </Route>
-                <Route path="/user/preferences">
-                  {loggedIn && <Preference /> }
-                </Route>
-              </Switch>
+        <div className="App d-flex flex-column min-vh-100 justify-content-between">
+            <div className="body mb-5">
+              <UserContext.Provider value={{user, setUser, loggedIn, setLoggedIn, preference, setPreference}}>
+                <NavBar />
+                <div className="container" id="body">
+                  <Switch>
+                    <Route exact path="/">
+                      <Main position={ position } positionLoaded={ positionLoaded }/>
+                    </Route>
+                    <Route path="/register">
+                      <RegistrationForm />
+                    </Route>
+                    <Route path="/login">
+                      <LoginForm />
+                    </Route>
+                    <Route path="/dashboard">
+                      <Dashboard user={ user }/>
+                    </Route>
+                    <Route path="/day/:lat/:lng">
+                      <OneDayCard />
+                    </Route>
+                    <Route path="/user/preferences">
+                      <Preference />
+                    </Route>
+                  </Switch>
+                </div>
+              </UserContext.Provider>
             </div>
-          </UserContext.Provider>
+            <Footer />
         </div>
     </BrowserRouter>
   );

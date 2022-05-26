@@ -79,7 +79,7 @@ module.exports.login = async (req, res) => {
     // note that the response object allows chained calls to cookie and json
     res
         .cookie("usertoken", userToken, process.env.SECRET_KEY, {httpOnly: true})
-        .json({ msg: "Successfully logged in." });
+        .json({ msg: "Successfully logged in.", user:user });
 }
 
 module.exports.logout = (req, res) => {
