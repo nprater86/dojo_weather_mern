@@ -8,7 +8,6 @@ import axios from 'axios';
 const NavBar = props => {
     const userContext = useContext(UserContext);
     const history = useHistory();
-    const [geolocation, setGeolocation] = useState({});
 
     //will bring user to the url specific in the onClick event listener
     function handleLink(e,url){
@@ -25,6 +24,7 @@ const NavBar = props => {
                 console.log("User logged out successfully -->", res);
                 userContext.setLoggedIn(false);
                 userContext.setUser({});
+                userContext.setPreference("imperial");
                 history.push("/");
             })
             .catch(err => console.error(err))

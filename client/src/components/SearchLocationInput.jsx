@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom';
 
 
 function SearchLocationInput(props) {
-    const [query, setQuery] = useState("");
     const autoCompleteRef = useRef(null);
     const history = useHistory();
 
@@ -28,8 +27,8 @@ function SearchLocationInput(props) {
 
     function handlePlaceSelect() {
         const addressObject = autoComplete.getPlace(); // get place from google api
-        const updatedQuery = addressObject.formatted_address;
-        history.push(`/day/${addressObject.geometry.location.lat(updatedQuery)}/${addressObject.geometry.location.lng(updatedQuery)}`);
+        const formattedQuery = addressObject.formatted_address;
+        history.push(`/day/${addressObject.geometry.location.lat(formattedQuery)}/${addressObject.geometry.location.lng(formattedQuery)}`);
         autoCompleteRef.current.value = "";
     }
 
@@ -38,7 +37,6 @@ function SearchLocationInput(props) {
             <input
             className="form-control me-2"
             ref={autoCompleteRef}
-            onChange={event => setQuery(event.target.value)}
             placeholder="Search City"
             />
         </>
